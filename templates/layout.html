@@ -1,0 +1,21 @@
+<!doctype html>
+<title>Change Order</title>
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+<script src="https://a.alipayobjects.com/alipay-request/3.0.3/index.js"></script>
+<script src="https://as.alipayobjects.com/g/datavis/g2/2.0.3/index.js"></script>
+
+<body>
+  
+
+  <div class="title">
+    <img src="static/fordham.jpg" alt="" style="height: 80px;">
+    <img src="static/nyc-ddc.png" alt="" style="height: 80px;">
+  </div>
+  <div class="page">
+
+    {% block body %}{% endblock %}
+
+  </div>
+</body>

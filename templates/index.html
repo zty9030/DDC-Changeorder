@@ -1,0 +1,127 @@
+{% extends "layout.html" %}
+{% block body %}
+<div id="form">
+	<p id="error" style="color:red">Not Valid Amount or Duration</p>
+	<form action="{{url_for('analysis')}}" method="post" onsubmit="return validateForm()">
+		<p>Contract Type: <select id ="con_select" name="Contract type"></select></p>
+		<p>Unit: <select id="unit_select" name ="Unit tpye"></select>(Optional)</p>
+		<p>Project Type: <select id="proj_select" name="Project type"></select>(Optional)</p>
+		<p>Contract Amount: <input id="amount" type="text" name="Amount" > $</p>
+		<p>Duration: <input id='duration' type="text" name="Duration" > days</p>
+		<button type="submit" id="analyse">Analyse</button>
+	</form>
+</div>
+
+<div id="res">
+	<h1>Result</h1>
+	<section id='pred'></section>
+	<dl>
+      {% for key, value in results.para.iteritems() %}
+            <p>{{ key }}: {{ value }}<p/>
+      {% endfor %}
+	</dl>
+	<h1>Prediction Details</h1>
+	<div id="pi"></div>
+	<a href="{{url_for('clean')}}"><button id="clean">Clean and Back</button></a>
+</div>
+
+<script type="text/javascript">
+	var result =  JSON.parse("{{ results.res|tojson }}");
+	var label = ['<10%','10%-30%','30%-60%','>60%']
+	
+	$(function(){
+		con = ['Regular', 'CM Build', 'Service Contracts', 'Regular Design',
+       'other', 'Pure REI Manage', 'Regular Architecture & Engineering',
+       'CM Design Build', 'Pass-Through', 'Project Specific'];
+
+       	unit = ['None', 'Bronx & N. Queens', 'Staten Island', 'Courts', 'S. Queens',
+       'Brooklyn', 'Manhattan & Citywide', 'Fire', 'Transportation',
+       'Libraries', 'Parks', 'Culturals', 'Human Services', 'Sanitation',
+       'Health', 'Police', 'Corrections', 'Executive'];
+
+       proj=['None', 'Sewer', 'New Construction', 'Ped Ramps',
+       'Street Reconstruction', 'Sidewalks', 'Renovation', 'Other',
+       'Water', 'Upgrade', 'Street Resurfacing'];
+
+       $.each(con, function (index, value) {
+    		$('#con_select').append($('<option/>', { 
+        		value: value,
+        		text : value 
+    		}));
+		}); 
+       $.each(unit, function (index, value) {
+    		$('#unit_select').append($('<option/>', { 
+        		value: value,
+        		text : value 
+    		}));
+		});
+       $.each(proj, function (index, value) {
+    		$('#proj_select').append($('<option/>', { 
+        		value: value,
+        		text : value 
+    		}));
+		});
+       $('#error').hide()
+       //console.log(result)
+
+       if (result.length==0){
+       	$('#res').hide();
+       }else{
+       	$('#form').hide();
+       };
+
+       ind =  result.indexOf(Math.max(...result))
+
+       $('#pred').append($('<h1></h1>').text('Predict FAA Ratio: '+ label[ind]))
+       // $('#clean').hide();
+
+	});
+	function validateForm(){
+
+		amount = $('#amount').val()
+		duration = $('#duration').val()
+		if(amount>0 && duration>0){
+			return true
+		}else{
+			$('#error').show(100)
+			return false;
+		}
+
+	};
+</script>
+<script type="text/javascript">
+      var data = new Array();
+	for (var i = 0; i<result.length; i++) {
+		var row = {'name':label[i],'value':result[i]}
+		data.push(row);
+	}
+      var Stat = G2.Stat;
+      var chart = new G2.Chart({
+        id: 'pi',
+        width: 500,
+        height: 300
+      });
+      chart.source(data);
+      // 重要：绘制饼图时，必须声明 theta 坐标系
+      chart.coord('theta', {
+        radius: 0.8 // 设置饼图的大小
+      });
+      chart.legend('name', {
+        position: 'bottom'
+      });
+      chart.intervalStack()
+        .position(Stat.summary.percent('value'))
+        .color('name')
+        .label('name*..percent',function(name, percent){
+        percent = (percent * 100).toFixed(2) + '%';
+        return name + ' ' + percent;
+      });
+      chart.render();
+      // 设置默认选中
+      var geom = chart.getGeoms()[0]; // 获取所有的图形
+      var items = geom.getData(); // 获取图形对应的数据
+      //geom.setSelected(items[1]); // 设置选中
+    </script>
+    <!-- G2 code end -->
+</script>
+{% endblock %}
