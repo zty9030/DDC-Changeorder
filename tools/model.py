@@ -3,16 +3,12 @@ import pickle
 import pandas as pd
 import numpy as np
 import sklearn 
-
-#x = [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1094.0,8836540.0]
-#x=np.array(x)
-#result = modelrf.predict_proba(x)
-#
-#print result[0]
+import os
 
 def randomforest(dic):
-    
-    modelrf = pickle.load(open('tools/modelrf.pickle','rb'))
+    my_dir = os.path.dirname( __file__)
+    pickle_file_path = os.path.join(my_dir, 'modelrf.pickle') 
+    modelrf = pickle.load(open(pickele_file_path,'rb'))
 
     col = [u'Bronx & N. Queens', u'Brooklyn', u'Corrections', u'Courts',
        u'Culturals', u'Executive', u'Fire', u'Health', u'Human Services',
